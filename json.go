@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// helper function for responding wil error messages
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	if code > 499 {
 		log.Println("Responding with 5XX error:", msg)
@@ -19,6 +20,7 @@ func respondWithError(w http.ResponseWriter, code int, msg string) {
 	})
 }
 
+// marshal whatever is given as json format
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	dat, err := json.Marshal(payload)
 	if err != nil {
