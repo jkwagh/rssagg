@@ -11,7 +11,7 @@ import (
 	"github.com/jkwagh/rssagg/internal/database"
 	"github.com/joho/godotenv"
 
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" //for sqlc need to import but is not used in main
 )
 
 type apiConfig struct {
