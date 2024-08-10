@@ -25,7 +25,7 @@ func (apiCfg *apiConfig) handlerCreateFeedFollow(w http.ResponseWriter, r *http.
 	}
 
 	//calling createUser function created in users.sql.go by sqlc based on create/User SQL query
-	feed, err := apiCfg.DB.CreateFeedFollow(r.Context(), database.CreateFeedFollowParams{
+	feedFollow, err := apiCfg.DB.CreateFeedFollow(r.Context(), database.CreateFeedFollowParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
@@ -38,6 +38,16 @@ func (apiCfg *apiConfig) handlerCreateFeedFollow(w http.ResponseWriter, r *http.
 	}
 
 	//replaced database user with our user created in models.go file to use version we control
-	respondWithJSON(w, 201, databaseFeedToFeed(feed))
+	respondWithJSON(w, 201, databaseFeedFollowToFeedFollow(feedFollow))
 }
 
+func (apiCfg *apiConfig) handlerGetFeedFollows(w http.ResponseWriter, r *http.Request, user database.User) {
+	
+	feedFollow, err := apiCfg.DB.GetFeedFollows(r.Context(), user.ID)
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("Couldn't get feed follows: %v", err))
+		return
+	}
+
+	respondWithJSON(w, 201, databaseFeedFollowToFeedFollow(feedFollow))
+}
