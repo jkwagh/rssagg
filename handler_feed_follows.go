@@ -11,10 +11,9 @@ import (
 )
 
 // should respond if everything is working properly
-func (apiCfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Request, user database.User) {
+func (apiCfg *apiConfig) handlerCreateFeedFollow(w http.ResponseWriter, r *http.Request, user database.User) {
 	type parameters struct {
-		Name string `json:"name"`
-		URL string `json:"url"`
+		FeedId uuid.UUID `json:"feed_id"`
 	}
 	decoder := json.NewDecoder(r.Body)
 
@@ -26,30 +25,19 @@ func (apiCfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Reques
 	}
 
 	//calling createUser function created in users.sql.go by sqlc based on create/User SQL query
-	feed, err := apiCfg.DB.CreateFeed(r.Context(), database.CreateFeedParams{
+	feed, err := apiCfg.DB.CreateFeedFollow(r.Context(), database.CreateFeedFollowParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
-		Name:      params.Name,
-		Url: params.URL,
 		UserID: user.ID,
+		FeedID: params.FeedId,
 	})
 	if err != nil {
-		respondWithError(w, 400, fmt.Sprintf("Couldn't create feed: %v", err))
+		respondWithError(w, 400, fmt.Sprintf("Couldn't create feed follow: %v", err))
 		return
 	}
 
 	//replaced database user with our user created in models.go file to use version we control
 	respondWithJSON(w, 201, databaseFeedToFeed(feed))
-}
-
-func (apiCfg *apiConfig) handlerGetFeeds(w http.ResponseWriter, r *http.Request) {
-	feeds, err := apiCfg.DB.GetFeeds(r.Context())
-	if err != nil {
-		respondWithError(w, 400, fmt.Sprintf("Couldn't get feeds: %v", err))
-		return
-	}
-
-	respondWithJSON(w, 201, databaseFeedsToFeeds(feeds))
 }
 
